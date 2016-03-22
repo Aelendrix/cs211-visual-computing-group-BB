@@ -1,37 +1,48 @@
 float depth = 2000;
-int posX = 0;
-int posY = 0;
-float frz = 0;
-float frx = 0;
+
+//rotation variables
 float rz = 0;
 float rx = 0;
-float vx = 0;
-float vz = 0;
+
+//mouseDragged variable to calculate the rotation variables
+float frz = 0;
+float frx = 0;
+int posX = 0;
+int posY = 0;
+
+//speed MouseWheel()
 float speed = 1;
+//sphere radius
 int sphereR = 50;
-float sphereX = 0;
-float sphereZ = 0;
+//plan
 float planX = 1500;
 float planY = 50;
 float planZ = 1500;
+//ball
+Mover mover;
+//cylinder
+Cylinder cylinder;
+float cylinderBaseSize = 100;
+float cylinderHeight = 200;
+int cylinderResolution = 40;
 
-float dt = 0.01;
-int gravityConstant=10;
-PVector friction;
-PVector gravityForce;
-PVector ballLocation = new PVector(0, -(planY/2+sphereR), 0);
-PVector ballVelocity = new PVector(0, 0, 0);
-float normalForce = 1;
-float mu = 0.01;
-float frictionMagnitude = normalForce * mu;
+//Mode: false = normal, true = cylinder creator
+boolean stop = false;
 
+//Position of all cylinder
+ArrayList<PVector> cylinderPos = new ArrayList<PVector>();
 //PFont f; 
+
 
 void settings() {
   size(600, 600, P3D);
 }
 void setup() {
   noStroke();
+  //main class of the ball
+  mover = new Mover();
+  //create one cylinder to have access to his PShape
+  cylinder = new Cylinder(cylinderBaseSize,cylinderHeight,cylinderResolution);
   //f = createFont("Arial",32,true);
 }
 void draw() {
@@ -39,51 +50,70 @@ void draw() {
   //textFont(f,16); 
   //fill(100,0,0);
   //text("Kappa", 200, 100);
+  
+  //basic setup to each frame
   fill(255);
-  camera(0 , -height*3, depth, 0, 0, 0, 0, 1, 0);
+  background(200);
   directionalLight(50, 100, 125, 0, 1, 0);
   ambientLight(102, 102, 102);
-  background(200);
-  rotateZ(rz);
-  rotateX(rx);
+  //change camera pos depending of the mode: [Place Cylinder or normal]
+  if (stop)
+  {
+    camera(0, -height*3, 1, 0, 0, 0, 0, 1, 0);
+  } else {
+    camera(0, -height*3, depth, 0, 0, 0, 0, 1, 0);
+    rotateZ(rz);
+    rotateX(rx);
+  }
   //plan
   box(planX, planY, planZ);
-  //X red
+  //X axis red
   fill(255, 0, 0);
   box(3000, 10, 10);
-  //Y green
-  fill(0, 255, 0);
-  box(10, 3000, 10);
-  //Z blue
+  //Z axis blue
   fill(0, 0, 255);
   box(10, 10, 3000);
-  pushMatrix();
-  calculateBallLocation();
-  fill(100, 100, 100);
-  translate(ballLocation.x, ballLocation.y, ballLocation.z);
-  sphere(sphereR);
-  popMatrix();
+  
+  //velocity,location,drawing,and collision of the main ball in the mover Class
+  if (!stop)
+  {
+    mover.checkCylinderCollision(cylinderPos,cylinderBaseSize);
+    mover.checkEdges();
+    mover.update();
+  }
+  mover.display();
+  
+  //draw all the cylinder
+  for (int i = 0; i<cylinderPos.size(); i++)
+  {
+    pushMatrix();
+    translate(cylinderPos.get(i).x, -cylinderHeight-planY/2, cylinderPos.get(i).y);
+    shape(cylinder.getShape());
+    popMatrix();
+  }
 }
-
+//calculate the total rotation of the system, depending of mousePressed()
 void mouseDragged() {
 
-  
-  rx = frx - (mouseY-posY)*speed*3*(PI/3)/(height);
-  rz = frz + (mouseX-posX)*speed*3*(PI/3)/(width);
-  if (rx<-PI/3) {
-    rx=-PI/3;
-  }
-  if (rx>PI/3) {
-    rx=PI/3;
-  }
-  if (rz<-PI/3) {
-    rz=-PI/3;
-  }
-  if (rz>PI/3) {
-    rz=PI/3;
+  if (!stop) {
+    rx = frx - (mouseY-posY)*speed*3*(PI/3)/(height);
+    rz = frz + (mouseX-posX)*speed*3*(PI/3)/(width);
+    if (rx<-PI/3) {
+      rx=-PI/3;
+    }
+    if (rx>PI/3) {
+      rx=PI/3;
+    }
+    if (rz<-PI/3) {
+      rz=-PI/3;
+    }
+    if (rz>PI/3) {
+      rz=PI/3;
+    }
   }
 }
 
+//save the actual data of the mousepressed
 void mousePressed() {
   posX = mouseX;
   posY = mouseY;
@@ -91,6 +121,15 @@ void mousePressed() {
   frz = rz;
 }
 
+void mouseClicked() {
+  //create new cylinder
+  if (stop)
+  {
+    cylinderPos.add(new PVector((mouseX-height/2)*2, (mouseY-width/2)*2));
+  }
+}
+
+//set the speed of the whole rotation
 void mouseWheel(MouseEvent event) {
   if (event.getCount()>0)
   {
@@ -106,35 +145,19 @@ void mouseWheel(MouseEvent event) {
     speed=1.5;
   }
 }
-
-void calculateBallLocation()
+//check if it is in "Place Cylinder Mode"
+void keyPressed()
 {
-  gravityForce = new PVector(sin(rz) * gravityConstant, 0, -sin(rx) * gravityConstant);
-  ballVelocity.x += gravityForce.x*dt;
-  ballVelocity.y += gravityForce.y*dt;
-  ballVelocity.z += gravityForce.z*dt;
-  friction = ballVelocity.copy();
-  friction.mult(-1);
-  friction.normalize();
-  friction.mult(frictionMagnitude);
-  
-  ballVelocity = ballVelocity.add(friction);
-  ballLocation.add(ballVelocity);
-  if (ballLocation.x >= planX/2 ) {
-    ballLocation.x = planX/2;
-    ballVelocity.x *= -0.4;
+  if (keyCode == SHIFT)
+  {
+    stop = true;
   }
-  if (ballLocation.x < -planX/2 ) {
-    ballLocation.x = -planX/2;
-    ballVelocity.x *= -0.4;
+}
+//check if it is in normal mode
+void keyReleased()
+{
+  if (keyCode == SHIFT)
+  {
+    stop = false;
   }
-  if (ballLocation.z > planZ/2 ) {
-    ballLocation.z = planZ/2;
-    ballVelocity.z *= -0.4;
-  }
-  if (ballLocation.z < -planZ/2 ) {
-    ballLocation.z = -planZ/2;
-    ballVelocity.z *= -0.4;
-  }
-  
 }
