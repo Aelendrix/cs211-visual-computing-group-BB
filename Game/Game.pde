@@ -59,9 +59,11 @@ void draw() {
   //change camera pos depending of the mode: [Place Cylinder or normal]
   if (stop)
   {
-    camera(0, -height*3, 1, 0, 0, 0, 0, 1, 0);
+    camera(0, -height*10, 1, 0, 0, 0, 0, 1, 0);
+    ortho(-planX,planX,-planZ,planZ);
   } else {
     camera(0, -height*3, depth, 0, 0, 0, 0, 1, 0);
+    perspective();
     rotateZ(rz);
     rotateX(rx);
   }
@@ -125,7 +127,9 @@ void mouseClicked() {
   //create new cylinder
   if (stop)
   {
-    cylinderPos.add(new PVector((mouseX-height/2)*2, (mouseY-width/2)*2));
+    float px=map(mouseX-height/2,-height/2,height/2,-planX,planX);
+    float py=map(mouseY-width/2,-width/2,width/2,-planZ,planZ);
+    cylinderPos.add(new PVector(px, py));
   }
 }
 
