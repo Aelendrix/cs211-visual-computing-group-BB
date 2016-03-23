@@ -129,7 +129,11 @@ void mouseClicked() {
   {
     float px=map(mouseX-height/2,-height/2,height/2,-planX,planX);
     float py=map(mouseY-width/2,-width/2,width/2,-planZ,planZ);
+    //check if it is in the plate
+    if(-planX/2<px&&-planZ/2<py&&planX/2>px&&planZ/2>py)
+    {
     cylinderPos.add(new PVector(px, py));
+    }
   }
 }
 
