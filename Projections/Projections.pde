@@ -1,7 +1,3 @@
- float angleX = 0;
-float angleY = 0;
-float angleZ = 0;
-double pi = 3.141592;
 void settings() {
 size (400, 400, P2D);
 }
@@ -27,24 +23,7 @@ input3DBox = transformBox(input3DBox, transform3);
 projectBox(eye, input3DBox).render();
 }
 
-void keyPressed()
-{
-  if(key == CODED){
-      if(keyCode == UP){
-        angleX -= pi/16;
-      }
-      else if(keyCode == DOWN){
-        angleX += pi/16;
-      }
-      if(keyCode == LEFT){
-        angleY -= pi/16;
-      }
-      else if(keyCode == RIGHT){
-        angleY += pi/16;
-      }
-  }
-}
-
+//projection d'un point 3d en 2d par rapport à la camera eye
 My2DPoint projectPoint(My3DPoint eye, My3DPoint p) {
   float xp,yp;
   xp=(p.x-eye.x)*eye.z/(eye.z-p.z);
@@ -52,6 +31,7 @@ My2DPoint projectPoint(My3DPoint eye, My3DPoint p) {
 return new My2DPoint(xp,yp);
 }
 
+//Points 2D
 class My2DPoint {
 float x;
 float y;
@@ -60,7 +40,7 @@ this.x = x;
 this.y = y;
 }
 }
-
+//points 3D
 class My3DPoint {
 float x;
 float y;
@@ -71,7 +51,7 @@ this.y = y;
 this.z = z;
 }
 }
-
+//cube en 2d
 class My2DBox {
 My2DPoint[] s;
 My2DBox(My2DPoint[] s) {
@@ -95,7 +75,7 @@ line(s[5].x,s[5].y,s[6].x,s[6].y);
 line(s[6].x,s[6].y,s[7].x,s[7].y);
 }
 }
-
+//cube en 3d
 class My3DBox {
 My3DPoint[] p;
 My3DBox(My3DPoint origin, float dimX, float dimY, float dimZ){
@@ -116,7 +96,7 @@ My3DBox(My3DPoint[] p) {
 this.p = p;
 }
 }
-
+//transform a 3d box in a 2d box using perspective and the camera eye
 My2DBox projectBox (My3DPoint eye, My3DBox box) {
   My2DPoint[] s = new My2DPoint[8];
   for(int i=0;i<box.p.length;i++)
@@ -161,7 +141,7 @@ return(new float[][] {{1, 0 , 0 , x},
 {0, 0 , 1 , z},
 {0, 0 , 0 , 1}});
 }
-
+//matrix product of 2 matrix
 float[] matrixProduct(float[][] a, float[] b) {
 float[] c = b;
 for(int i=0;i<a.length;i++)
