@@ -56,6 +56,12 @@ void draw() {
   background(200);
   directionalLight(50, 100, 125, 0, 1, 0);
   ambientLight(102, 102, 102);
+  //X axis red
+  fill(255, 0, 0);
+  box(3000, 10, 10);
+  //Z axis blue
+  fill(0, 0, 255);
+  box(10, 10, 3000);
   //change camera pos depending of the mode: [Place Cylinder or normal]
   if (stop)
   {
@@ -68,13 +74,8 @@ void draw() {
     rotateX(rx);
   }
   //plan
+  fill(255);
   box(planX, planY, planZ);
-  //X axis red
-  fill(255, 0, 0);
-  box(3000, 10, 10);
-  //Z axis blue
-  fill(0, 0, 255);
-  box(10, 10, 3000);
   
   //velocity,location,drawing,and collision of the main ball in the mover Class
   if (!stop)
