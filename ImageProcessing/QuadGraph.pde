@@ -11,9 +11,9 @@ class QuadGraph {
 
   public QuadGraph(ArrayList<PVector> lines, int w, int h)
   {
-    build(lines,w,h);
+    build(lines, w, h);
   }
-  
+
   void build(List<PVector> lines, int width, int height) {
 
     int n = lines.size();
@@ -26,7 +26,7 @@ class QuadGraph {
     for (int i = 0; i < lines.size(); i++) {
       for (int j = i + 1; j < lines.size(); j++) {
         if (intersect(lines.get(i), lines.get(j), width, height)) {
-          int a[] = {i,j};
+          int a[] = {i, j};
           graph[idx] = a;
           idx++;
         }
@@ -70,7 +70,6 @@ class QuadGraph {
       for (int i = 1; i < cy.length; i++) {
         s += "," + cy[i];
       }
-      System.out.println(s);
     }
     return cycles;
   }
@@ -316,21 +315,17 @@ class QuadGraph {
 
     return quad;
   }
-  
 }
 
 class CWComparator implements Comparator<PVector> {
-
   PVector center;
-
   public CWComparator(PVector center) {
     this.center = center;
   }
-
   @Override
     public int compare(PVector b, PVector d) {
-    if (Math.atan2(b.y-center.y, b.x-center.x)<Math.atan2(d.y-center.y, d.x-center.x))      
-      return -1; 
+    if (Math.atan2(b.y-center.y, b.x-center.x)<Math.atan2(d.y-center.y, d.x-center.x))
+      return -1;
     else return 1;
   }
 }
